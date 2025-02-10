@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini E-commerce Website</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+        .container{
+            width: 100%;
+            background-color: black;
+            color: aliceblue;
+            /* text-align: center; */
+            padding: 10px;
+
+        }
+        .container>h1{
+            text-align: center;
+        }
+       
+        .innercontainer{
+            display: flex;
+            justify-content: space-around;
+            gap: 1%;
+            margin-top: 30px;
+        }
+        .leftcol{
+            width: 23%;
+            border: 0.1px solid ;
+            padding: 20px;
+        }
+        .leftcol>h2{
+            margin-left: 50px;
+            font-size: 2rem;
+        }
+        .leftcolinner{ 
+            margin-left: 50px;
+            margin-top: 20px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .checkboxcol{
+            margin-right: 4%;
+            margin-bottom: .5rem;
+        }
+        .rightcol{
+            border: 0.1px solid;
+            padding: 20px;
+            flex-basis: 72%;         
+        }
+        .rightcol>h2{
+            margin: 0 0 17px 17px;
+            font-size: 2rem;
+        }
+        .productDetails{
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 2rem;
+        }
+        .imgcol{
+            flex-basis: 30%;
+            box-shadow: 1px 1px 20px ;
+            padding: 1rem;
+            text-align: justify;
+            cursor: pointer;
+        }
+
+        .imgcol>img{
+            width: 100%;
+            /* height: 100%; */
+        }
+        
+        .imgcol:hover{
+            box-shadow: 1px 1px 20px rgb(150, 149, 149);
+        }
+        .pagination{
+            text-align: center;
+            margin-top: 5rem;
+            border: 0.1px solid;
+            padding: 10px;
+        }
+        button{
+            font-size: 20px;
+            padding: 5px 10px;
+            color: aliceblue;
+            background-color: black;
+            /* border-right: 0.1px solid; */
+            /* border: none; */
+            cursor: pointer;
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> Mini E-Commerce Site </h1>
+        <div class="innercontainer">
+            
+            <div class="leftcol">
+                <h2> Category </h2>
+                <div class="leftcolinner">
+                    
+                </div>
+            </div>
+
+            <div class="rightcol">
+                <h2> Products List </h2>
+                <div class="productDetails">
+                    <div class="imgcol">
+                        <img src="head-phone.jpeg" alt="">
+                        <div class="imgitemdetails">
+                            <h3>  Title : imgitemdetails</h3>
+                            <h3>Brice : $ 4.5 | Brand: </h3> 
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+
+
+    let getCategoryItems = document.querySelector('.leftcolinner');
+    // console.log(getCategoryItems)
+
+    let getProductItems = document.querySelector('.productDetails');
+
+    let pagination = document.querySelector('.pagination');
+    // console.log(getProductItems);
+
+    let products, FinalProducts;
+
+    let getCategoryDetails = async ()=>{
+
+        getCategoryItems.innerHTML = '';
+
+        let categoryItemsList = await fetch(`https://dummyjson.com/products/category-list`);
+        // console.log(categoryItemsList);
+
+        let finalCategoryList = await categoryItemsList.json();
+        // console.log(finalCategoryList);
+
+
+
+    finalCategoryList.map(
+
+            (categoriesItem, index)=>{
+            // console.log(categoriesItem)
+
+                categoryItemsData = `
+                    
+                        <div class="checkboxcol">
+                            <input type="checkbox" value="${categoriesItem}" onclick="getSeletedCategory()">
+                            <span> ${categoriesItem}</span>
+                        </div>
+                `;
+                getCategoryItems.innerHTML = getCategoryItems.innerHTML + categoryItemsData;
+
+                // console.log(finalCategoryList);
+
+        }); // end of finalCategoryList.map
+
+    };// end of getCategoryDetails = async ()
+
+    let DataAccordingPage = (page = 1) => {
+
+        FinalProducts = products.slice((page - 1) * 20, page * 20);
+        // console.log(FinalProducts)
+
+        showFinalProduct();
+    }
+
+    let showFinalProduct = () => {
+
+        getProductItems.innerHTML = '';
+
+        FinalProducts.map(
+            (v, i) => {
+
+                let product = `
+                        
+                            <div class="imgcol">
+                                <img src="${v.thumbnail}" alt="">
+                                    <div class="imgitemdetails">
+                                        <h3>  Title: ${v.title} </h3>
+                                        <h3>Brice : $ ${v.price} | Rating: ${v.rating}<h3/> 
+                                        <h3> Brand : ${v.brand} </h3> 
+                                    </div>
+                            </div>    
+                        `;
+
+                        getProductItems.innerHTML = getProductItems.innerHTML + product;
+            }
+        )
+
+    }
+
+    let getProductDetails = async (seletedCategory='') =>{
+        getProductItems.innerHTML='';
+        pagination.innerHTML = '';
+        let apiUrl;
+       if (seletedCategory==='') {
+
+            apiUrl =`https://dummyjson.com/products?limit=194`;
+        } 
+        else{
+
+            apiUrl = `https://dummyjson.com/products/category/${seletedCategory}`;
+        }
+        // console?.log(apiUrl);
+        let productDetailsFetch = await fetch(apiUrl);
+        let productDetailsDataGet = await productDetailsFetch.json();
+        
+        //   let {products} = productDetailsDataGet;
+        products = productDetailsDataGet.products
+        // console.log(products);
+            let totalProducts = products.length;
+            // console.log(totalProducts);
+                let pageCount = Math.ceil(totalProducts / 20);
+                // console.log(pageCount);
+                for(let i = 1 ; i <= pageCount ; i++) {
+                    let btn = `
+                        <button onclick="DataAccordingPage(${i})"> ${i} </button>
+                    `;
+                    pagination.innerHTML = pagination.innerHTML + btn;
+                }
+                DataAccordingPage();
+    }; //end of getProductDetails = async ()
+
+    let getSeletedCategory = ()=>{
+
+        let seletedCategory;
+        let allCheckbox = document.querySelectorAll('input'); 
+
+        allCheckbox.forEach(
+            (checkbox,i) => {
+
+            if(checkbox.checked == true) {
+
+                    seletedCategory = checkbox.value;
+
+                }
+            }
+        ); //end of  allCheckbox.forEach()
+
+        getProductDetails(seletedCategory);
+
+    }; //end of  let getSeletedCategory = ()
+
+    getCategoryDetails();
+    getProductDetails();
+</script>
+</html>
